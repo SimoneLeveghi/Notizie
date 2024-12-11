@@ -44,7 +44,10 @@ public class Client {
                 userInputString = userInput.readLine();
 
                 clientOutput.writeBytes(userInputString + '\n');
-                System.out.println("Risposta dal server: " + serverInput.readLine());
+                String notizia;
+                while(!(notizia = serverInput.readLine()).equals("Fine")) {
+                    System.out.println(notizia);
+                }
             }
             System.out.println("Connessione terminata.");
             clientSocket.close();

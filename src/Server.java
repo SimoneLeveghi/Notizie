@@ -4,17 +4,20 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Server {
     private ServerSocket server;
     private Socket client;
     private final int porta;
+    private final ArrayList<Notizia> notizie;
 
     public Server() {
         server = null;
         client = null;
         porta = 1234;
+        notizie = new ArrayList<Notizia>();
     }
     private class ClientHandler implements Runnable {
         private Socket clientSocket;
@@ -30,8 +33,20 @@ public class Server {
 
                 while (true) {
                     String message = clientInput.readLine();
-                    System.out.println("Messaggio ricevuto da client: " + message);
-                    serverOutput.writeBytes(message + "\n");
+                    try {
+                        message = message.replace("[", "").replace("]", "");
+                        String[] splitMessage = message.split(", ");
+                        notizie.add(new Notizia(splitMessage[0], splitMessage[1], splitMessage[2]));
+                    }
+                    catch(Exception e) {
+                        serverOutput.writeBytes("Notizia non valida\n");
+                    }
+
+                    serverOutput.writeBytes("Notizie:\n");
+                    for(Notizia n : notizie) {
+                        serverOutput.writeBytes(n.toString() + "\n");
+                    }
+                    serverOutput.writeBytes("Fine\n");
                     serverOutput.flush();
                 }
             } catch (IOException e) {
